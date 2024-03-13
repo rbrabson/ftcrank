@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	appName  = "ftcpredict"
+	appName  = "predict"
 	Version  = "0.1.0"
 	Revision = "v1beta1"
 	usage    = "FTC match prediction utility"

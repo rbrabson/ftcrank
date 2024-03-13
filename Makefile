@@ -11,7 +11,7 @@ build-windows:
 	$(GO) build -v --ldflags="-w -X main.Version=$(VERSION) -X main.Revision=$(REVISION)" \
 		-o bin/windows/amd64/rank cmd/rank/main.go  # windows
 	$(GO) build -v --ldflags="-w -X main.Version=$(VERSION) -X main.Revision=$(REVISION)" \
-		-o bin/windows/amd64/predict cmd/rank/main.go  # windows
+		-o bin/windows/amd64/predict cmd/predict/main.go  # windows
 
 build-linux: export GOOS=linux
 build-linux: export GOARCH=amd64

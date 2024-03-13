@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	appName  = "ftcrank"
+	appName  = "rank"
 	Version  = "0.1.0"
 	Revision = "v1beta1"
 	usage    = "FTC team ranking utility"
@@ -63,9 +63,9 @@ var (
 			Usage:   "FTC event from which the teams should be ranked",
 		},
 		&cli.BoolFlag{
-			Name:    "end",
+			Name:    "start",
 			Aliases: []string{"x"},
-			Usage:   "Whether the teams at the event should be ranked at start or end of the event.",
+			Usage:   "Whether the teams at the event should be ranked at start or end of the event",
 		},
 		&cli.StringFlag{
 			Name:    "region",
@@ -106,7 +106,7 @@ func runApp(cli *cli.Context) error {
 	}
 
 	// List the teams ratings at the end of the event
-	if cli.IsSet("event") && !(cli.IsSet("end") && cli.Bool("end")) {
+	if cli.IsSet("event") && !cli.Bool("start") {
 		count := 1
 		for i, team := range rank.RankedTeams {
 			lastRating := team.Ratings[len(team.Ratings)-1]
