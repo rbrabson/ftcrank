@@ -6,8 +6,11 @@ import (
 	"os"
 	"sort"
 
+	"github.com/eullerpereira94/openskill"
+	"github.com/fatih/color"
 	"github.com/rbrabson/ftcrank/ftcdata"
 	"github.com/rbrabson/ftcrank/rank"
+	"github.com/rodaine/table"
 	"github.com/urfave/cli/v2"
 )
 
@@ -85,40 +88,77 @@ var (
 	}
 )
 
+type TeamRating struct {
+	Team   *rank.Team
+	Rating *openskill.Rating
+}
+
+func printRanking(teams []*TeamRating) {
+	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
+	columnFmt := color.New(color.FgYellow).SprintfFunc()
+
+	tbl := table.New("Rank", "Name", "mu", "sigma")
+	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
+
+	for i, team := range teams {
+		tbl.AddRow(i+1,
+			team.Team.Info.DisplayTeamNumber+" "+team.Team.Info.NameShort,
+			fmt.Sprintf("%.2f", team.Rating.AveragePlayerSkill),
+			fmt.Sprintf("%.2f", team.Rating.SkillUncertaintyDegree),
+		)
+	}
+
+	tbl.Print()
+}
+
 func runApp(cli *cli.Context) error {
 	ftcdata.LoadAll()
 	rank.RankTeams()
 
 	// List the current ratings for teams within the requested region
 	if cli.IsSet("region") {
+		teams := make([]*TeamRating, 0, 110)
 		count := 1
-		for i, team := range rank.RankedTeams {
+		for _, team := range rank.RankedTeams {
 			if team.Info.HomeRegion != nil && *team.Info.HomeRegion == cli.String("region") {
-				rating := team.Ratings[len(team.Ratings)-1].EndRating
-				fmt.Printf("Rank: %3d, GlobalRank: %4d, Team: %5d %s, mu: %.2f, sigma: %.2f\n", count, i+1, team.Info.TeamNumber, team.Info.NameShort, rating.AveragePlayerSkill, rating.SkillUncertaintyDegree)
+				rating := &team.Ratings[len(team.Ratings)-1].EndRating
+				teamRating := &TeamRating{
+					Team:   team,
+					Rating: rating,
+				}
+				teams = append(teams, teamRating)
 				count++
 			}
 			if cli.IsSet("limit") && cli.Int("limit") < count {
 				break
 			}
 		}
+		printRanking(teams)
+
 		return nil
 	}
 
 	// List the teams ratings at the end of the event
 	if cli.IsSet("event") && !cli.Bool("start") {
+		teams := make([]*TeamRating, 0, 200)
 		count := 1
-		for i, team := range rank.RankedTeams {
+		for _, team := range rank.RankedTeams {
 			lastRating := team.Ratings[len(team.Ratings)-1]
 			if lastRating.EventCode == cli.String("event") {
-				rating := team.Ratings[len(team.Ratings)-1].EndRating
-				fmt.Printf("Rank: %2d, GlobalRank: %4d, Team: %5d %s, mu: %.2f, sigma: %.2f\n", count, i+1, team.Info.TeamNumber, team.Info.NameShort, rating.AveragePlayerSkill, rating.SkillUncertaintyDegree)
+				rating := &team.Ratings[len(team.Ratings)-1].EndRating
+				teamRating := &TeamRating{
+					Team:   team,
+					Rating: rating,
+				}
+				teams = append(teams, teamRating)
 				count++
 			}
 			if cli.IsSet("limit") && cli.Int("limit") < count {
 				break
 			}
 		}
+		printRanking(teams)
+
 		return nil
 	}
 
@@ -151,15 +191,21 @@ func runApp(cli *cli.Context) error {
 				return rating1.SkillUncertaintyDegree < rating2.SkillUncertaintyDegree
 			}
 		})
+		teams := make([]*TeamRating, 0, 200)
 		count := 1
-		for i, team := range eventTeams {
-			rating := team.Ratings[len(team.Ratings)-1].StartRating
-			fmt.Printf("Rank: %2d, Team: %5d %s, mu: %.2f, sigma: %.2f\n", i+1, team.Info.TeamNumber, team.Info.NameShort, rating.AveragePlayerSkill, rating.SkillUncertaintyDegree)
+		for _, team := range eventTeams {
+			rating := &team.Ratings[len(team.Ratings)-1].StartRating
+			teamRating := &TeamRating{
+				Team:   team,
+				Rating: rating,
+			}
+			teams = append(teams, teamRating)
 			count++
 			if cli.IsSet("limit") && cli.Int("limit") < count {
 				break
 			}
 		}
+		printRanking(teams)
 
 		return nil
 	}

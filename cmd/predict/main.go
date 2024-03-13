@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/rbrabson/ftcrank/ftcdata"
 	"github.com/rbrabson/ftcrank/predict"
 	"github.com/rbrabson/ftcrank/rank"
+	"github.com/rodaine/table"
 	"github.com/urfave/cli/v2"
 )
 
@@ -75,17 +78,43 @@ var (
 	}
 )
 
+func getTeamDisplayName(team *rank.Team) string {
+	return fmt.Sprintf("%d %s", team.Info.TeamNumber, team.Info.NameShort)
+}
+
+func printPredictions(matches []*predict.MatchPrediction) {
+	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
+	columnFmt := color.New(color.FgYellow).SprintfFunc()
+
+	tbl := table.New("Match", "RedAlliance", "BlueAlliance", "Red Wins", "Blue Wins")
+	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
+
+	for i, match := range matches {
+		tbl.AddRow(i+1,
+			fmt.Sprintf("%s\n%s", getTeamDisplayName(match.RedAlliance[0]), getTeamDisplayName(match.RedAlliance[1])),
+			fmt.Sprintf("%s\n%s", getTeamDisplayName(match.BlueAlliance[0]), getTeamDisplayName(match.BlueAlliance[1])),
+			fmt.Sprintf("%.2f", match.RedWinProbability),
+			fmt.Sprintf("%.2f", match.BlueWinProbability),
+		)
+	}
+
+	tbl.Print()
+}
+
 func runApp(cli *cli.Context) error {
 	ftcdata.LoadAll()
 	rank.RankTeams()
 
 	eventCode := cli.String("event")
+	var matches []*predict.MatchPrediction
 	if cli.IsSet("team") {
 		teamNumber := cli.Int("team")
-		predict.PredictMatches(eventCode, teamNumber)
+		matches = predict.PredictMatches(eventCode, teamNumber)
 	} else {
-		predict.PredictMatches(eventCode)
+		matches = predict.PredictMatches(eventCode)
 	}
+	printPredictions(matches)
+
 	return nil
 }
 

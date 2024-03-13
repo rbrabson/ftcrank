@@ -6,20 +6,20 @@ import (
 	"strings"
 
 	"github.com/eullerpereira94/openskill"
-	"github.com/rbrabson/ftc/ftc"
 	"github.com/rbrabson/ftcrank/ftcdata"
 	"github.com/rbrabson/ftcrank/rank"
 	"github.com/rbrabson/ftcrank/skill"
 )
 
 type MatchPrediction struct {
-	RedAlliance     []*ftc.Team
-	BlueAlliance    []*ftc.Team
-	WinningAlliance string
-	WinProbability  float64
+	MatchNumber        int
+	RedAlliance        []*rank.Team
+	BlueAlliance       []*rank.Team
+	RedWinProbability  float64
+	BlueWinProbability float64
 }
 
-func PredictMatches(eventCode string, teamNumber ...int) []MatchPrediction {
+func PredictMatches(eventCode string, teamNumber ...int) []*MatchPrediction {
 	// Get the schedule for the event
 	var schedules *ftcdata.FtcSchedules
 	for _, s := range ftcdata.Schedules {
@@ -33,6 +33,7 @@ func PredictMatches(eventCode string, teamNumber ...int) []MatchPrediction {
 		os.Exit(1)
 	}
 
+	matches := make([]*MatchPrediction, 0, 200)
 	for _, schedule := range schedules.Schedules {
 		redAlliance := make([]*rank.Team, 0, 2)
 		blueAlliance := make([]*rank.Team, 0, 2)
@@ -59,17 +60,22 @@ func PredictMatches(eventCode string, teamNumber ...int) []MatchPrediction {
 				}
 			}
 		}
-		// Need to get the starting skill for the teams entering
-		// the event.
 
 		if len(teamNumber) > 0 {
 			if redAlliance[0].Info.TeamNumber != teamNumber[0] && redAlliance[1].Info.TeamNumber != teamNumber[0] && blueAlliance[0].Info.TeamNumber != teamNumber[0] && blueAlliance[1].Info.TeamNumber != teamNumber[0] {
 				continue
 			}
 		}
+
 		results := skill.PredictWin(redAllianceSkills, blueAllianceSkills)
-		fmt.Printf("%d %s & %d %s (%.2f%%) vs. %d %s & %d %s (%.2f%%)\n", redAlliance[0].Info.TeamNumber, redAlliance[0].Info.NameShort, redAlliance[1].Info.TeamNumber, redAlliance[1].Info.NameShort, results[0]*100, blueAlliance[0].Info.TeamNumber, blueAlliance[0].Info.NameShort, blueAlliance[1].Info.TeamNumber, blueAlliance[1].Info.NameShort, results[1]*100)
+		match := &MatchPrediction{
+			RedAlliance:        redAlliance,
+			BlueAlliance:       blueAlliance,
+			RedWinProbability:  results[0],
+			BlueWinProbability: results[1],
+		}
+		matches = append(matches, match)
 	}
 
-	return nil
+	return matches
 }
