@@ -92,11 +92,11 @@ type TeamRating struct {
 	Rating *openskill.Rating
 }
 
-func printRanking(teams []*TeamRating) {
+func printGlobalRanking(teams []*TeamRating) {
 	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
 	columnFmt := color.New(color.FgYellow).SprintfFunc()
 
-	tbl := table.New("Rank", "Name", "mu", "sigma")
+	tbl := table.New("Global", "Name", "MU", "Sigma")
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 	for i, team := range teams {
@@ -110,15 +110,34 @@ func printRanking(teams []*TeamRating) {
 	tbl.Print()
 }
 
+func printRanking(teams []*TeamRating) {
+	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
+	columnFmt := color.New(color.FgYellow).SprintfFunc()
+
+	tbl := table.New("Rank", "Global", "Name", "MU", "Sigma")
+	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
+
+	for i, team := range teams {
+		tbl.AddRow(i+1,
+			team.Team.GlobalRating,
+			fmt.Sprintf("%5d %s", team.Team.Info.TeamNumber, team.Team.Info.NameShort),
+			fmt.Sprintf("%.2f", team.Rating.AveragePlayerSkill),
+			fmt.Sprintf("%.2f", team.Rating.SkillUncertaintyDegree),
+		)
+	}
+
+	tbl.Print()
+}
+
 func runApp(cli *cli.Context) error {
 	ftcdata.LoadAll()
-	rank.RankTeams()
+	rankedTeams := rank.RankTeams()
 
 	// List the current ratings for teams within the requested region
 	if cli.IsSet("region") {
 		teams := make([]*TeamRating, 0, 110)
 		count := 1
-		for _, team := range rank.RankedTeams {
+		for _, team := range rankedTeams {
 			if team.Info.HomeRegion != nil && *team.Info.HomeRegion == cli.String("region") {
 				rating := &team.Ratings[len(team.Ratings)-1].EndRating
 				teamRating := &TeamRating{
@@ -170,7 +189,6 @@ func runApp(cli *cli.Context) error {
 				eventTeams = append(eventTeams, team)
 			}
 		}
-		fmt.Println(len(eventTeams))
 		sort.Slice(eventTeams, func(i, j int) bool {
 			team1 := eventTeams[i]
 			team2 := eventTeams[j]
@@ -224,7 +242,7 @@ func runApp(cli *cli.Context) error {
 			break
 		}
 	}
-	printRanking(teams)
+	printGlobalRanking(teams)
 
 	return nil
 }

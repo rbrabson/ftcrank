@@ -13,8 +13,9 @@ var (
 
 // A team used for rankings
 type Team struct {
-	Info    *ftc.Team
-	Ratings []*MatchRating
+	Info         *ftc.Team
+	GlobalRating int
+	Ratings      []*MatchRating
 }
 
 // Rankings at a given match

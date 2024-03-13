@@ -16,7 +16,7 @@ var (
 
 // RankTeams generates the rankings for all teams that participated in FTC
 // for the given season.
-func RankTeams() {
+func RankTeams() []*Team {
 	// Make sure the matches are loaded
 	if len(MatchMap) == 0 {
 		loadMatches()
@@ -33,6 +33,11 @@ func RankTeams() {
 
 	// Sort the RankedTeams based on their average skill and uncertantity degree
 	RankedTeams = getSortedTeams()
+	for i, team := range RankedTeams {
+		team.GlobalRating = i + 1
+	}
+
+	return RankedTeams
 }
 
 // rankEventMatches ranks all matches that occurred at an event
@@ -86,7 +91,6 @@ func rankEventMatch(event ftc.Event, match *ftc.Match) {
 	} else {
 		rateMatch(blueAlliance, redAlliance)
 	}
-
 }
 
 // rateMatch gets the openskill ratings for a match between two alliances
