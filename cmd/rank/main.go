@@ -102,7 +102,7 @@ func printRanking(teams []*TeamRating) {
 
 	for i, team := range teams {
 		tbl.AddRow(i+1,
-			team.Team.Info.DisplayTeamNumber+" "+team.Team.Info.NameShort,
+			fmt.Sprintf("%5d %s", team.Team.Info.TeamNumber, team.Team.Info.NameShort),
 			fmt.Sprintf("%.2f", team.Rating.AveragePlayerSkill),
 			fmt.Sprintf("%.2f", team.Rating.SkillUncertaintyDegree),
 		)
