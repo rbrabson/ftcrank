@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"sort"
@@ -210,7 +209,24 @@ func runApp(cli *cli.Context) error {
 		return nil
 	}
 
-	return errors.New("neither region nor event were set")
+	// Print globally ranked teams
+	teams := make([]*TeamRating, 0, 200)
+	count := 1
+	for _, team := range rank.RankedTeams {
+		rating := &team.Ratings[len(team.Ratings)-1].EndRating
+		teamRating := &TeamRating{
+			Team:   team,
+			Rating: rating,
+		}
+		teams = append(teams, teamRating)
+		count++
+		if cli.IsSet("limit") && cli.Int("limit") < count {
+			break
+		}
+	}
+	printRanking(teams)
+
+	return nil
 }
 
 func main() {
