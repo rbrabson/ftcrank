@@ -209,7 +209,7 @@ func runApp(cli *cli.Context) error {
 		return nil
 	}
 
-	// Print globally ranked teams
+	// List globally ranked teams
 	teams := make([]*TeamRating, 0, 200)
 	count := 1
 	for _, team := range rank.RankedTeams {
