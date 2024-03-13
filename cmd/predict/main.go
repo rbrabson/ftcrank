@@ -89,8 +89,8 @@ func printPredictions(matches []*predict.MatchPrediction) {
 	tbl := table.New("Match", "RedAlliance", "BlueAlliance", "Red Wins %", "Blue Wins %")
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
-	for i, match := range matches {
-		tbl.AddRow(i+1,
+	for _, match := range matches {
+		tbl.AddRow(match.MatchNumber,
 			fmt.Sprintf("%s\n%s", getTeamDisplayName(match.RedAlliance[0]), getTeamDisplayName(match.RedAlliance[1])),
 			fmt.Sprintf("%s\n%s", getTeamDisplayName(match.BlueAlliance[0]), getTeamDisplayName(match.BlueAlliance[1])),
 			fmt.Sprintf("%.2f", match.RedWinProbability*100),

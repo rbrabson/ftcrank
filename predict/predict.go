@@ -34,7 +34,7 @@ func PredictMatches(eventCode string, teamNumber ...int) []*MatchPrediction {
 	}
 
 	matches := make([]*MatchPrediction, 0, 200)
-	for _, schedule := range schedules.Schedules {
+	for i, schedule := range schedules.Schedules {
 		redAlliance := make([]*rank.Team, 0, 2)
 		blueAlliance := make([]*rank.Team, 0, 2)
 		for _, team := range schedule.Teams {
@@ -69,6 +69,7 @@ func PredictMatches(eventCode string, teamNumber ...int) []*MatchPrediction {
 
 		results := skill.PredictWin(redAllianceSkills, blueAllianceSkills)
 		match := &MatchPrediction{
+			MatchNumber:        i + 1,
 			RedAlliance:        redAlliance,
 			BlueAlliance:       blueAlliance,
 			RedWinProbability:  results[0],
