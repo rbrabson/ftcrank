@@ -18,40 +18,41 @@ var (
 
 type FtcEventMatches struct {
 	EventCode string
-	Matches   []ftc.Match
+	Matches   []*ftc.Match
 }
 
 // RetrieveMatches gets the matches that have occurred during an FTC season.
 func RetrieveMatches() error {
 	// Iterate over all the events
 	for _, event := range Events {
-		if event.TypeName == EVENT_QUALIFIER || event.TypeName == EVENT_CHAMPIONSHIP || event.TypeName == EVENT_FIRST_CHAMPIONSHIP {
-			var ftcMatch *FtcEventMatches
-			matches, err := ftc.GetMatchResults(config.FTC_SEASON, event.Code, ftc.QUALIFIER)
-			if err != nil {
-				fmt.Printf("Warning: Retrieving awards for %s, tournamenLevel=%s, error=%s\n", event.Code, ftc.QUALIFIER, err.Error())
-			} else {
+		if !(event.TypeName == EVENT_QUALIFIER || event.TypeName == EVENT_CHAMPIONSHIP || event.TypeName == EVENT_FIRST_CHAMPIONSHIP) {
+			continue
+		}
+		var ftcMatch *FtcEventMatches
+		matches, err := ftc.GetMatchResults(config.FTC_SEASON, event.Code, ftc.QUALIFIER)
+		if err != nil {
+			fmt.Printf("Warning: Retrieving awards for %s, tournamenLevel=%s, error=%s\n", event.Code, ftc.QUALIFIER, err.Error())
+		} else {
+			ftcMatch = &FtcEventMatches{
+				EventCode: event.Code,
+				Matches:   matches,
+			}
+		}
+		matches, err = ftc.GetMatchResults(config.FTC_SEASON, event.Code, ftc.PLAYOFF)
+		if err != nil {
+			fmt.Printf("Warning: Retrieving awards for %s, tournamenLevel=%s, error=%s\n", event.Code, ftc.PLAYOFF, err.Error())
+		} else {
+			if ftcMatch == nil {
 				ftcMatch = &FtcEventMatches{
 					EventCode: event.Code,
 					Matches:   matches,
 				}
-			}
-			matches, err = ftc.GetMatchResults(config.FTC_SEASON, event.Code, ftc.PLAYOFF)
-			if err != nil {
-				fmt.Printf("Warning: Retrieving awards for %s, tournamenLevel=%s, error=%s\n", event.Code, ftc.PLAYOFF, err.Error())
 			} else {
-				if ftcMatch == nil {
-					ftcMatch = &FtcEventMatches{
-						EventCode: event.Code,
-						Matches:   matches,
-					}
-				} else {
-					ftcMatch.Matches = append(ftcMatch.Matches, matches...)
-				}
+				ftcMatch.Matches = append(ftcMatch.Matches, matches...)
 			}
-			if ftcMatch != nil {
-				Matches = append(Matches, ftcMatch)
-			}
+		}
+		if ftcMatch != nil {
+			Matches = append(Matches, ftcMatch)
 		}
 	}
 

@@ -20,7 +20,7 @@ var (
 // FtcScores is an FTC scores with the event code included
 type FtcScores struct {
 	EventCode string `json:"eventCode"`
-	Scores    []ftc.MatchScores
+	Scores    []*ftc.MatchScores
 }
 
 // RetrieveScores retrieves the scores from the FTC API

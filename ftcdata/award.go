@@ -15,7 +15,7 @@ const (
 )
 
 var (
-	Awards []ftc.TeamAward = make([]ftc.TeamAward, len(Events))
+	Awards []*ftc.TeamAward = make([]*ftc.TeamAward, len(Events))
 )
 
 func RetrieveAwards() error {

@@ -6,7 +6,7 @@ require (
 	github.com/eullerpereira94/openskill v0.5.0
 	github.com/fatih/color v1.16.0
 	github.com/joho/godotenv v1.5.1
-	github.com/rbrabson/ftc v0.0.0-20240311041437-65e47245a101
+	github.com/rbrabson/ftc v0.0.0-20240313233149-f3748ee965d7
 	github.com/rodaine/table v1.1.1
 	github.com/urfave/cli/v2 v2.27.1
 )

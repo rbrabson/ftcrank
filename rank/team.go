@@ -58,6 +58,6 @@ func newTeam(teamNumber int) *Team {
 // loadFtcTeams loads the teams into the ftcTeamMap for easier access
 func loadFtcTeams() {
 	for _, team := range ftcdata.Teams {
-		ftcTeamMap[team.TeamNumber] = &team
+		ftcTeamMap[team.TeamNumber] = team
 	}
 }

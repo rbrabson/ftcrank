@@ -24,6 +24,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rbrabson/ftc v0.0.0-20240311041437-65e47245a101 h1:g8Zm4EZbWQkSdv1lCTAPHsQpvevb7kgzbQEkVuFOWdM=
 github.com/rbrabson/ftc v0.0.0-20240311041437-65e47245a101/go.mod h1:YvptBm7iQnoR17Cs1qG7xykjbIkvg7W4MqfIj1aeEao=
+github.com/rbrabson/ftc v0.0.0-20240313233149-f3748ee965d7 h1:b0esi8En88GbuYB5qwmxHR+ePwGxz0qqAYzWFu8XyBQ=
+github.com/rbrabson/ftc v0.0.0-20240313233149-f3748ee965d7/go.mod h1:YvptBm7iQnoR17Cs1qG7xykjbIkvg7W4MqfIj1aeEao=
 github.com/rivo/uniseg v0.2.0 h1:S1pD9weZBuJdFmowNwbpi7BJ8TNftyUImj/0WQi72jY=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rodaine/table v1.1.1 h1:zBliy3b4Oj6JRmncse2Z85WmoQvDrXOYuy0JXCt8Qz8=

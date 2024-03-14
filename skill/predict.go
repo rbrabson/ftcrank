@@ -6,7 +6,7 @@ import (
 
 // PredictWin returns the probability of each team has to win ordered by the
 // order of the teams.
-func PredictWin(alliance1 []*openskill.Rating, alliance2 []*openskill.Rating) []float64 {
+func PredictWin(alliance1, alliance2 []*openskill.Rating) []float64 {
 	teams := []openskill.Team{alliance1, alliance2}
 	winLikelihood := openskill.PredictWin(teams, nil)
 	return winLikelihood

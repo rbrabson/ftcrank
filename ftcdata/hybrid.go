@@ -20,7 +20,7 @@ var (
 // ftcrank is an FTC ranking with the event code included
 type FtcHybridSchedules struct {
 	EventCode string `json:"eventCode"`
-	Schedules []ftc.HybridSchedule
+	Schedules []*ftc.HybridSchedule
 }
 
 // RetrieveHybridSchedules retrieves the schedule data from the FTC API

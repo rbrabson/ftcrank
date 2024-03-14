@@ -22,7 +22,7 @@ const (
 
 var (
 	// The FTC events for a given year
-	Events = make([]ftc.Event, 0)
+	Events = make([]*ftc.Event, 0)
 )
 
 // RetrieveEvents retrieves the set of events for a given year using the FTC developer API

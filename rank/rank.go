@@ -41,16 +41,16 @@ func RankTeams() []*Team {
 }
 
 // rankEventMatches ranks all matches that occurred at an event
-func rankEventMatches(event ftc.Event, matches *ftcdata.FtcEventMatches) {
+func rankEventMatches(event *ftc.Event, matches *ftcdata.FtcEventMatches) {
 	for _, match := range matches.Matches {
 		if len(match.Teams) > 0 {
-			rankEventMatch(event, &match)
+			rankEventMatch(event, match)
 		}
 	}
 }
 
 // rankEventMatch ranks a single match that ocurred at an event
-func rankEventMatch(event ftc.Event, match *ftc.Match) {
+func rankEventMatch(event *ftc.Event, match *ftc.Match) {
 	redAlliance := make([]*Team, 0, 2)
 	blueAlliance := make([]*Team, 0, 2)
 
@@ -94,7 +94,7 @@ func rankEventMatch(event ftc.Event, match *ftc.Match) {
 }
 
 // rateMatch gets the openskill ratings for a match between two alliances
-func rateMatch(winningAlliance []*Team, losingAlliance []*Team) {
+func rateMatch(winningAlliance, losingAlliance []*Team) {
 	winningRatings := getAllianceRatings(winningAlliance)
 	losingRatings := getAllianceRatings(losingAlliance)
 	winningRatings, losingRatings = skill.Rate(winningRatings, losingRatings)

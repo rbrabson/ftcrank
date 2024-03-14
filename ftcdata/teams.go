@@ -13,7 +13,7 @@ const (
 )
 
 var (
-	Teams []ftc.Team = make([]ftc.Team, 0, 11301)
+	Teams []*ftc.Team
 )
 
 // Have to get the teams and move through the pages
@@ -43,6 +43,7 @@ func StoreTeams() error {
 
 // LoadEvents loads the events from the file system
 func LoadTeams() error {
+	Teams = make([]*ftc.Team, 0, 11301)
 	data, err := readFile(TEAMS_FILE_NAME)
 	if err != nil {
 		return err

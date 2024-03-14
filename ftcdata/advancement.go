@@ -71,7 +71,7 @@ func retrieveAdvancementsFrom(eventCode string) error {
 	for _, advancement := range advancements {
 		ftcAdvancement := FtcAdvancementsFrom{
 			EventCode:        eventCode,
-			AdvancementsFrom: advancement,
+			AdvancementsFrom: *advancement,
 		}
 		AdvancementsFrom = append(AdvancementsFrom, ftcAdvancement)
 	}

@@ -5,12 +5,12 @@ import (
 )
 
 // WriteFile writes a file containing the data into a file in the specified directory.
-func WriteFile(path string, file string, data []byte) error {
-	err := os.MkdirAll(path, 0755)
+func WriteFile(path, file string, data []byte) error {
+	err := os.MkdirAll(path, 0o755)
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(file, data, 0644)
+	err = os.WriteFile(file, data, 0o644)
 	if err != nil {
 		return err
 	}

@@ -20,7 +20,7 @@ var (
 // ftcrank is an FTC ranking with the event code included
 type ftcrank struct {
 	EventCode string `json:"eventCode"`
-	Rankings  []ftc.Ranking
+	Rankings  []*ftc.Ranking
 }
 
 // RetrieveRankings gets the rankings from the FTC API server

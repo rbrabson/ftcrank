@@ -6,7 +6,7 @@ import (
 )
 
 // Rate rates a group of teams for classification.
-func Rate(winningAlliance []*openskill.Rating, losingAlliance []*openskill.Rating) ([]*openskill.Rating, []*openskill.Rating) {
+func Rate(winningAlliance, losingAlliance []*openskill.Rating) (updatedWinningAlliance, updatedLosingAlliance []*openskill.Rating) {
 	teams := []openskill.Team{winningAlliance, losingAlliance}
 	updatedTeams := openskill.Rate(teams, config.DEFAULT_OPTIONS)
 
