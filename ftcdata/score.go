@@ -25,30 +25,32 @@ type FtcScores struct {
 
 // RetrieveScores retrieves the scores from the FTC API
 func RetrieveScores() error {
+	// TODO: combine all the scores for a single event into a single entry
+
 	// Iterate over all the events
 	for _, event := range Events {
+		// If an event that contains scores
 		if event.TypeName == EVENT_QUALIFIER || event.TypeName == EVENT_CHAMPIONSHIP || event.TypeName == EVENT_FIRST_CHAMPIONSHIP {
+			// Get the qualification scores
 			scores, err := ftc.GetEventScores(config.FTC_SEASON, event.Code, ftc.QUALIFIER)
 			if err != nil {
-				fmt.Printf("Warning: Retrieving scores for %s, tournamenLevel=%s, error=%s\n", event.Code, ftc.QUALIFIER, err.Error())
-			} else {
-				score := FtcScores{
-					EventCode: event.Code,
-					Scores:    scores,
-				}
-				Scores = append(Scores, score)
+				fmt.Printf("Error: %s\n", err.Error())
+				continue
 			}
+			score := FtcScores{
+				EventCode: event.Code,
+				Scores:    scores,
+			}
+			// Add the playoff scores
 			scores, err = ftc.GetEventScores(config.FTC_SEASON, event.Code, ftc.PLAYOFF)
 			if err != nil {
-				fmt.Printf("Warning: Retrieving scores for %s, tournamenLevel=%s, error=%s\n", event.Code, ftc.PLAYOFF, err.Error())
-			} else {
-				score := FtcScores{
-					EventCode: event.Code,
-					Scores:    scores,
-				}
-				Scores = append(Scores, score)
+				fmt.Printf("Error: %s\n", err.Error())
+				continue
 			}
+			score.Scores = append(score.Scores, scores...)
 
+			// Save the scores for the event
+			Scores = append(Scores, score)
 		}
 	}
 
@@ -68,4 +70,40 @@ func LoadScores() error {
 		return err
 	}
 	return json.Unmarshal(data, &Scores)
+}
+
+// UpdateScores adds or updates the scores for the given event
+func UpdateScores(eventCode string) error {
+	// Get the qualification scores
+	scores, err := ftc.GetEventScores(config.FTC_SEASON, eventCode, ftc.QUALIFIER)
+	if err != nil {
+		return err
+	}
+	score := FtcScores{
+		EventCode: eventCode,
+		Scores:    scores,
+	}
+	// Add the playoff scores
+	scores, err = ftc.GetEventScores(config.FTC_SEASON, eventCode, ftc.PLAYOFF)
+	if err != nil {
+		return err
+	}
+	score.Scores = append(score.Scores, scores...)
+
+	// Add or update the scores
+	updated := false
+	for i := range Scores {
+		// Update the existng scores for the event
+		if Scores[i].EventCode == eventCode {
+			Scores[i] = score
+			updated = true
+			break
+		}
+	}
+	// Add the scores for the event
+	if !updated {
+		Scores = append(Scores, score)
+	}
+
+	return StoreScores()
 }

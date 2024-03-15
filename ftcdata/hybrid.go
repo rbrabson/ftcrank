@@ -26,28 +26,29 @@ type FtcHybridSchedules struct {
 // RetrieveHybridSchedules retrieves the schedule data from the FTC API
 func RetrieveHybridSchedules() error {
 	for _, event := range Events {
+		// If an event that has scoring
 		if event.TypeName == EVENT_QUALIFIER || event.TypeName == EVENT_CHAMPIONSHIP || event.TypeName == EVENT_FIRST_CHAMPIONSHIP {
+			// Get the qualification matches
 			schedules, err := ftc.GetHybridSchedule(config.FTC_SEASON, event.Code, ftc.QUALIFIER)
 			if err != nil {
 				fmt.Printf("Warning: Retrieving rankings for %s, error=%s\n", event.Code, err.Error())
-			} else {
-				schedule := FtcHybridSchedules{
-					EventCode: event.Code,
-					Schedules: schedules,
-				}
-				HybridSchedules = append(HybridSchedules, schedule)
+				continue
+			}
+			schedule := FtcHybridSchedules{
+				EventCode: event.Code,
+				Schedules: schedules,
 			}
 
+			// Get the playoff matches and append them to the list of event schedules
 			schedules, err = ftc.GetHybridSchedule(config.FTC_SEASON, event.Code, ftc.PLAYOFF)
 			if err != nil {
 				fmt.Printf("Warning: Retrieving rankings for %s, error=%s\n", event.Code, err.Error())
-			} else {
-				schedule := FtcHybridSchedules{
-					EventCode: event.Code,
-					Schedules: schedules,
-				}
-				HybridSchedules = append(HybridSchedules, schedule)
+				continue
 			}
+			schedule.Schedules = append(schedule.Schedules, schedules...)
+
+			// Append the even schedule to the list of schedules
+			HybridSchedules = append(HybridSchedules, schedule)
 		}
 	}
 
@@ -67,4 +68,41 @@ func LoadHybridSchedules() error {
 		return err
 	}
 	return json.Unmarshal(data, &HybridSchedules)
+}
+
+// UpdateHybridSchedules updates the hybrid scores for the given event
+func UpdateHybridSchedules(eventCode string) error {
+	schedules, err := ftc.GetHybridSchedule(config.FTC_SEASON, eventCode, ftc.QUALIFIER)
+	if err != nil {
+		return err
+	}
+	schedule := FtcHybridSchedules{
+		EventCode: eventCode,
+		Schedules: schedules,
+	}
+
+	// Get the playoff matches and append them to the list of event schedules
+	schedules, err = ftc.GetHybridSchedule(config.FTC_SEASON, eventCode, ftc.PLAYOFF)
+	if err != nil {
+		return err
+	}
+	schedule.Schedules = append(schedule.Schedules, schedules...)
+
+	// Update or add the schedules
+	updated := false
+	for i := range HybridSchedules {
+		// Update the existing schedule
+		if HybridSchedules[i].EventCode == eventCode {
+			HybridSchedules[i] = schedule
+			updated = true
+			break
+		}
+	}
+	// Add a new schedule
+	if !updated {
+		HybridSchedules = append(HybridSchedules, schedule)
+	}
+
+	// Save on disk
+	return StoreHybridSchedules()
 }

@@ -2,6 +2,7 @@ package ftcdata
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/rbrabson/ftc/ftc"
@@ -72,4 +73,56 @@ func LoadMatches() error {
 		return err
 	}
 	return json.Unmarshal(data, &Matches)
+}
+
+func UpdateMatches(eventCode string) error {
+	var ftcMatch *FtcEventMatches
+
+	// Get the qualification matches
+	matches, err := ftc.GetMatchResults(config.FTC_SEASON, eventCode, ftc.QUALIFIER)
+	if err != nil {
+		fmt.Printf("Warning: Retrieving awards for %s, tournamenLevel=%s, error=%s\n", eventCode, ftc.QUALIFIER, err.Error())
+	} else {
+		ftcMatch = &FtcEventMatches{
+			EventCode: eventCode,
+			Matches:   matches,
+		}
+	}
+
+	// Get the playoff matches
+	matches, err = ftc.GetMatchResults(config.FTC_SEASON, eventCode, ftc.PLAYOFF)
+	if err != nil {
+		fmt.Printf("Warning: Retrieving awards for %s, tournamenLevel=%s, error=%s\n", eventCode, ftc.PLAYOFF, err.Error())
+	} else {
+		if ftcMatch == nil {
+			ftcMatch = &FtcEventMatches{
+				EventCode: eventCode,
+				Matches:   matches,
+			}
+		} else {
+			ftcMatch.Matches = append(ftcMatch.Matches, matches...)
+		}
+	}
+
+	if ftcMatch == nil {
+		fmt.Println("No Match Found")
+		return errors.New("no match found for event " + eventCode)
+	}
+
+	// Add or update the match
+	updated := false
+	for i := range Matches {
+		// Update the existing match
+		if Matches[i].EventCode == eventCode {
+			Matches[i] = ftcMatch
+			updated = true
+			break
+		}
+	}
+	// If a new match, then add it
+	if !updated {
+		Matches = append(Matches, ftcMatch)
+	}
+
+	return StoreMatches()
 }

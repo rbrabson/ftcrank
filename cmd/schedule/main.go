@@ -13,7 +13,7 @@ func main() {
 		return
 	}
 
-	err = ftcdata.RetrievSchedules()
+	err = ftcdata.RetrieveSchedules()
 	if err != nil {
 		fmt.Println(err)
 		return

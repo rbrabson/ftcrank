@@ -57,3 +57,34 @@ func LoadRankings() error {
 	}
 	return json.Unmarshal(data, &Rankings)
 }
+
+// UpdateRankings adds or updates the rankings for the given event
+func UpdateRankings(eventCode string) error {
+	// Get the ranking
+	rankings, err := ftc.GetRankings(config.FTC_SEASON, eventCode)
+	if err != nil {
+		return err
+	}
+	ranking := ftcrank{
+		EventCode: eventCode,
+		Rankings:  rankings,
+	}
+
+	// Add or update the ranking
+	updated := false
+	for i := range Rankings {
+		// Update the existing ranking
+		if Rankings[i].EventCode == eventCode {
+			Rankings[i] = ranking
+			updated = true
+			break
+		}
+	}
+	// Add a new ranking
+	if !updated {
+		Rankings = append(Rankings, ranking)
+	}
+
+	// Store the rankings
+	return StoreRankings()
+}

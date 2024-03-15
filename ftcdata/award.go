@@ -45,3 +45,26 @@ func LoadAwards() error {
 	}
 	return json.Unmarshal(data, &Awards)
 }
+
+func UpdateAwards(eventCode string) error {
+	awards, err := ftc.GetEventAwards(config.FTC_SEASON, eventCode)
+	if err != nil {
+		return err
+	}
+
+	for _, award := range awards {
+		updated := false
+		for i := range Awards {
+			if Awards[i].EventCode == award.EventCode && Awards[i].AwardID == award.AwardID && Awards[i].Series == award.Series {
+				Awards[i] = award
+				updated = true
+				break
+			}
+		}
+		if !updated {
+			Awards = append(Awards, award)
+		}
+	}
+
+	return StoreAwards()
+}

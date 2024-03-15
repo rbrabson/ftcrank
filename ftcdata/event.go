@@ -62,3 +62,8 @@ func LoadEvents() error {
 	}
 	return json.Unmarshal(data, &Events)
 }
+
+// UpdateEvents retrieves all events for a given season
+func UpdateEvents(eventCode string) error {
+	return RetrieveEvents()
+}
