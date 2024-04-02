@@ -58,9 +58,8 @@ var (
 		&cli.StringFlag{
 			Name:        "event",
 			Aliases:     []string{"e"},
-			Usage:       "FTC event from whichto predict the results",
-			DefaultText: "",
-			Required:    true,
+			Usage:       "FTC event from which to predict the results",
+			DefaultText: "x",
 		},
 		&cli.StringFlag{
 			Name:  "log",
@@ -73,7 +72,11 @@ var (
 func runApp(cli *cli.Context) error {
 	ftcdata.LoadAll()
 	eventCode := cli.String("event")
-	ftcdata.UpdateAll(eventCode)
+	if eventCode == "" {
+		ftcdata.RetrieveAll()
+	} else {
+		ftcdata.UpdateAll(eventCode)
+	}
 
 	return nil
 }
